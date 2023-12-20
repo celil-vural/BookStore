@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/celil-vural/BookStore/database"
 	"github.com/celil-vural/BookStore/models"
 	"github.com/celil-vural/BookStore/repositories"
 	"github.com/gofiber/fiber/v2"
@@ -8,7 +9,8 @@ import (
 )
 
 func GetAuthors(c *fiber.Ctx) error {
-	authors, err := repositories.GetAllAuthors()
+	repo := repositories.AuthorRepository{DB: database.DB.Db}
+	authors, err := repo.GetAllAuthors()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Could not get authors",
@@ -18,6 +20,7 @@ func GetAuthors(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"authors": authors})
 }
 func CreateAuthor(c *fiber.Ctx) error {
+	repo := repositories.AuthorRepository{DB: database.DB.Db}
 	author := new(models.Author)
 	if err := c.BodyParser(author); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -25,7 +28,7 @@ func CreateAuthor(c *fiber.Ctx) error {
 			"error":   err,
 		})
 	}
-	_, err := repositories.CreateAuthor(author)
+	_, err := repo.CreateAuthor(author)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Could not create author",
@@ -35,6 +38,7 @@ func CreateAuthor(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Author created successfully", "author": author})
 }
 func UpdateAuthor(c *fiber.Ctx) error {
+	repo := repositories.AuthorRepository{DB: database.DB.Db}
 	author := new(models.Author)
 	id, err := strconv.Atoi(c.Params("id"))
 	if err := c.BodyParser(author); err != nil {
@@ -55,7 +59,7 @@ func UpdateAuthor(c *fiber.Ctx) error {
 			"error":   "ID, Name and Surname fields cannot be empty",
 		})
 	}
-	auth, err := repositories.GetAuthorByID(id)
+	auth, err := repo.GetAuthorByID(id)
 	if auth == nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Could not update author",
@@ -68,7 +72,7 @@ func UpdateAuthor(c *fiber.Ctx) error {
 		})
 	}
 	author.CreatedAt = auth.CreatedAt
-	_, err = repositories.UpdateAuthor(author)
+	_, err = repo.UpdateAuthor(author)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Could not update author",
@@ -78,6 +82,7 @@ func UpdateAuthor(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Author updated successfully", "author": author})
 }
 func GetAuthorByID(c *fiber.Ctx) error {
+	repo := repositories.AuthorRepository{DB: database.DB.Db}
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -85,7 +90,7 @@ func GetAuthorByID(c *fiber.Ctx) error {
 			"error":   err,
 		})
 	}
-	author, err := repositories.GetAuthorByID(id)
+	author, err := repo.GetAuthorByID(id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Could not get author",
@@ -95,6 +100,7 @@ func GetAuthorByID(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"author": author})
 }
 func DeleteAuthorByID(c *fiber.Ctx) error {
+	repo := repositories.AuthorRepository{DB: database.DB.Db}
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -102,14 +108,14 @@ func DeleteAuthorByID(c *fiber.Ctx) error {
 			"error":   err,
 		})
 	}
-	author, err := repositories.GetAuthorByID(id)
+	author, err := repo.GetAuthorByID(id)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Could not delete author",
 			"error":   err,
 		})
 	}
-	err = repositories.DeleteAuthorByID(author.ID)
+	err = repo.DeleteAuthorByID(author.ID)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Could not delete author",

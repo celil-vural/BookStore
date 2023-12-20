@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/celil-vural/BookStore/database"
 	"github.com/celil-vural/BookStore/models"
 	"github.com/celil-vural/BookStore/repositories"
 	"github.com/gofiber/fiber/v2"
@@ -8,7 +9,8 @@ import (
 )
 
 func GetGenres(c *fiber.Ctx) error {
-	genres, err := repositories.GetAllGenres()
+	repo := repositories.GenreRepository{DB: database.DB.Db}
+	genres, err := repo.GetAllGenres()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Could not get genres",
@@ -18,6 +20,7 @@ func GetGenres(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"genres": genres})
 }
 func GetGenreByID(c *fiber.Ctx) error {
+	repo := repositories.GenreRepository{DB: database.DB.Db}
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -25,7 +28,7 @@ func GetGenreByID(c *fiber.Ctx) error {
 			"error":   err,
 		})
 	}
-	genre, err := repositories.GetGenreByID(uint(id))
+	genre, err := repo.GetGenreByID(uint(id))
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Could not get genre",
@@ -35,6 +38,7 @@ func GetGenreByID(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"genre": genre})
 }
 func CreateGenre(c *fiber.Ctx) error {
+	repo := repositories.GenreRepository{DB: database.DB.Db}
 	var genre models.Genre
 	err := c.BodyParser(&genre)
 	if err != nil {
@@ -43,7 +47,7 @@ func CreateGenre(c *fiber.Ctx) error {
 			"error":   err,
 		})
 	}
-	_, err = repositories.CreateGenre(&genre)
+	_, err = repo.CreateGenre(&genre)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Could not create genre",
@@ -53,6 +57,7 @@ func CreateGenre(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"genre": genre})
 }
 func UpdateGenre(c *fiber.Ctx) error {
+	repo := repositories.GenreRepository{DB: database.DB.Db}
 	genre := new(models.Genre)
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
@@ -73,7 +78,7 @@ func UpdateGenre(c *fiber.Ctx) error {
 			"error":   "ID and Name fields cannot be empty",
 		})
 	}
-	gen, err := repositories.GetGenreByID(uint(id))
+	gen, err := repo.GetGenreByID(uint(id))
 	if gen == nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Could not update genre",
@@ -81,7 +86,7 @@ func UpdateGenre(c *fiber.Ctx) error {
 		})
 	}
 	genre.CreatedAt = gen.CreatedAt
-	_, err = repositories.UpdateGenre(genre)
+	_, err = repo.UpdateGenre(genre)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Could not update genre",
@@ -91,6 +96,7 @@ func UpdateGenre(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"message": "Genre updated successfully", "genre": genre})
 }
 func DeleteGenreByID(c *fiber.Ctx) error {
+	repo := repositories.GenreRepository{DB: database.DB.Db}
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -98,14 +104,14 @@ func DeleteGenreByID(c *fiber.Ctx) error {
 			"error":   err,
 		})
 	}
-	genre, err := repositories.GetGenreByID(uint(id))
+	genre, err := repo.GetGenreByID(uint(id))
 	if genre == nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
 			"message": "Could not delete genre",
 			"error":   "Genre not found",
 		})
 	}
-	err = repositories.DeleteGenreByID(uint(id))
+	err = repo.DeleteGenreByID(uint(id))
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Could not delete genre",

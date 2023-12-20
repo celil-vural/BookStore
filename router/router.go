@@ -24,9 +24,6 @@ func SetupRoutes(app *fiber.App) {
 	book.Post("/", handler.CreateBook)
 	book.Put("/:id", handler.UpdateBook)
 	book.Delete("/:id", handler.DeleteBookByID)
-	//book.Get("/search/:query", handler.SearchBooks)
-	//book.Get("author/:author", handler.GetBooksByAuthor)
-	//book.Get("genre/:genre", handler.GetBooksByGenre)*/
 	// routes for author
 	author.Get("/", handler.GetAuthors)
 	author.Get("/:id", handler.GetAuthorByID)

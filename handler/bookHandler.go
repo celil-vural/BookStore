@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/celil-vural/BookStore/database"
 	"github.com/celil-vural/BookStore/models"
 	"github.com/celil-vural/BookStore/repositories"
 	"github.com/gofiber/fiber/v2"
@@ -8,7 +9,8 @@ import (
 )
 
 func GetAllBooks(c *fiber.Ctx) error {
-	books, err := repositories.GetAllBooks()
+	repo := repositories.BookRepository{DB: database.DB.Db}
+	books, err := repo.GetAllBooks()
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Could not get books",
@@ -18,6 +20,7 @@ func GetAllBooks(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"books": books})
 }
 func GetBookByID(c *fiber.Ctx) error {
+	repo := repositories.BookRepository{DB: database.DB.Db}
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -25,7 +28,7 @@ func GetBookByID(c *fiber.Ctx) error {
 			"error":   err,
 		})
 	}
-	book, err := repositories.GetBookByID(uint(id))
+	book, err := repo.GetBookByID(uint(id))
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "Book not found",
@@ -35,15 +38,16 @@ func GetBookByID(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"book": book})
 }
 func CreateBook(c *fiber.Ctx) error {
+	repo := repositories.BookRepository{DB: database.DB.Db}
 	book := new(models.Book)
 	err := c.BodyParser(&book)
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
-			"message": "Could not create book",
+			"message": "Could not create book ",
 			"error":   err,
 		})
 	}
-	book, err = repositories.CreateBook(book)
+	book, err = repo.CreateBook(book)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Could not create book",
@@ -53,6 +57,7 @@ func CreateBook(c *fiber.Ctx) error {
 	return c.Status(fiber.StatusCreated).JSON(fiber.Map{"book": book})
 }
 func UpdateBook(c *fiber.Ctx) error {
+	repo := repositories.BookRepository{DB: database.DB.Db}
 	book := new(models.Book)
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
@@ -68,7 +73,7 @@ func UpdateBook(c *fiber.Ctx) error {
 			"error":   err,
 		})
 	}
-	b, err := repositories.GetBookByID(uint(id))
+	b, err := repo.GetBookByID(uint(id))
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "Book not found",
@@ -76,16 +81,17 @@ func UpdateBook(c *fiber.Ctx) error {
 		})
 	}
 	book.CreatedAt = b.CreatedAt
-	book, err = repositories.UpdateBook(book)
+	updatedBook, err := repo.UpdateBook(book)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Could not update book",
 			"error":   err,
 		})
 	}
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"book": book})
+	return c.Status(fiber.StatusOK).JSON(fiber.Map{"book": updatedBook})
 }
 func DeleteBookByID(c *fiber.Ctx) error {
+	repo := repositories.BookRepository{DB: database.DB.Db}
 	id, err := strconv.Atoi(c.Params("id"))
 	if err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -93,14 +99,14 @@ func DeleteBookByID(c *fiber.Ctx) error {
 			"error":   err,
 		})
 	}
-	book, err := repositories.GetBookByID(uint(id))
+	book, err := repo.GetBookByID(uint(id))
 	if err != nil {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
 			"message": "Book not found",
 			"error":   err,
 		})
 	}
-	err = repositories.DeleteBook(&book)
+	err = repo.DeleteBook(&book)
 	if err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 			"message": "Could not delete book",
