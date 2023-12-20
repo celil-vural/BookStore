@@ -1,19 +1,12 @@
 package models
 
-import (
-	"gorm.io/gorm"
-	"time"
-)
-
 // Book model
 type Book struct {
-	gorm.Model
-	Id        uint      `json:"id" gorm:"primaryKey"`
-	Title     string    `json:"title"`
-	Price     float64   `json:"price"`
-	CreatedAt time.Time `json:"createdAt" gorm:"autoCreateTime"`
-	UpdatedAt time.Time `json:"updatedAt" gorm:"autoUpdateTime"`
+	Id       int     `json:"id" gorm:"primary_key"`
+	Title    string  `json:"title" gorm:"unique"`
+	Price    float64 `json:"price" gorm:"not null"`
+	AuthorID int     `json:"author_id" gorm:"not null"`
 	// Relationship
 	Genres []Genre `gorm:"many2many:book_genres;"`
-	Author *Author `gorm:"foreignkey:author_id"`
+	Author *Author `gorm:"foreignKey:AuthorID"`
 }

@@ -37,10 +37,11 @@ func Connect() {
 	log.Println("Connected")
 	db.Logger = logger.Default.LogMode(logger.Info)
 	log.Println("running migrations")
-	db.AutoMigrate(&models.Book{})
-	db.AutoMigrate(&models.BookGenre{})
-	db.AutoMigrate(&models.Author{})
-	db.AutoMigrate(&models.Genre{})
+	err = db.AutoMigrate(&models.User{}, &models.Author{}, &models.Genre{}, &models.BookGenre{}, &models.Book{})
+	if err != nil {
+		log.Fatal("Failed to migrate. \n", err)
+		os.Exit(2)
+	}
 	DB = Dbinstance{
 		Db: db,
 	}
