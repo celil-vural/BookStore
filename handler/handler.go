@@ -73,13 +73,3 @@ func Register(c *fiber.Ctx) error {
 	}
 	return c.Status(fiber.StatusOK).JSON(fiber.Map{"token": token})
 }
-func GetAllBooks(c *fiber.Ctx) error {
-	books, err := repositories.GetAllBooks()
-	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": "Could not get books",
-			"error":   err,
-		})
-	}
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{"books": books})
-}

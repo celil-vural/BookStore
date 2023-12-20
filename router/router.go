@@ -20,13 +20,13 @@ func SetupRoutes(app *fiber.App) {
 	user.Post("/register", handler.Register)
 	// routes for book
 	book.Get("/", handler.GetAllBooks)
-	//book.Get("/:id", handler.GetBookByID)
-	/*bookJwt.Post("/", handler.CreateBook)
-	bookJwt.Put("/:id", handler.UpdateBook)
-	bookJwt.Delete("/:id", handler.DeleteBookByID)
-	book.Get("/search/:query", handler.SearchBooks)
-	book.Get("author/:author", handler.GetBooksByAuthor)
-	book.Get("genre/:genre", handler.GetBooksByGenre)*/
+	book.Get("/:id", handler.GetBookByID)
+	book.Post("/", handler.CreateBook)
+	book.Put("/:id", handler.UpdateBook)
+	book.Delete("/:id", handler.DeleteBookByID)
+	//book.Get("/search/:query", handler.SearchBooks)
+	//book.Get("author/:author", handler.GetBooksByAuthor)
+	//book.Get("genre/:genre", handler.GetBooksByGenre)*/
 	// routes for author
 	author.Get("/", handler.GetAuthors)
 	author.Get("/:id", handler.GetAuthorByID)
@@ -37,6 +37,6 @@ func SetupRoutes(app *fiber.App) {
 	genre.Get("/", handler.GetGenres)
 	genre.Get("/:id", handler.GetGenreByID)
 	genre.Post("/", helper.AddJwt(), handler.CreateGenre)
-	//genreJwt.Put("/:id",helper.AddJwt(), handler.UpdateGenre)
-	//genreJwt.Delete("/:id",helper.AddJwt(), handler.DeleteGenreByID)
+	genre.Put("/:id", helper.AddJwt(), handler.UpdateGenre)
+	genre.Delete("/:id", helper.AddJwt(), handler.DeleteGenreByID)
 }
